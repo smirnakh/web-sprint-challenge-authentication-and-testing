@@ -1,10 +1,21 @@
 const router = require('express').Router();
+
 const { add } = require('./user-model');
 
 router.post('/register', async (req, res) => {
-  const user = await add(req.body);
+  try {
+    if (!req.body.username || !req.body.password) {
+      //res.status(400);
+      throw new Error('username and password required');
+    } else {
+      const user = await add(req.body);
+      res.json(user);
+    }
+  } catch (error) {
+    console.log('register failed', error);
+    res.status(400).send(error.message);
+  }
 
-  res.json(user);
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
