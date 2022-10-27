@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { add, findByUsername } = require('./user-model');
-
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 router.post('/register', async (req, res) => {
   try {
     if (!req.body.username || !req.body.password) {
@@ -47,8 +48,33 @@ router.post('/register', async (req, res) => {
   */
 });
 
-router.post('/login', (req, res) => {
-  res.end('implement login, please!');
+router.post('/login', async (req, res) => {
+  try {
+    if (!req.body.username || !req.body.password) {
+      //res.status(400);
+      throw new Error('username and password required');
+    } else {
+      const userExists = await findByUsername(req.body.username);
+      if (!userExists) {
+        throw new Error('invalid credentials');
+      } else {
+        const isValid = bcrypt.compareSync(
+          req.body.password,
+          userExists.password
+        );
+        if (!isValid) {
+          throw new Error('invalid credentials');
+        } else {
+          const token = buildToken(userExists);
+          res.json({ message: `welcome, ${userExists.username}`, token });
+        }
+      }
+    }
+  } catch (error) {
+    console.log('register failed', error);
+    res.status(400).send(error.message);
+  }
+
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -73,5 +99,14 @@ router.post('/login', (req, res) => {
       the response body should include a string exactly as follows: "invalid credentials".
   */
 });
+function buildToken(user) {
+  const payload = {
+    username: user.username,
+  };
+  const options = {
+    expiresIn: '1d',
+  };
+  return jwt.sign(payload, 'shh', options);
+}
 
 module.exports = router;
