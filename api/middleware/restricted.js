@@ -1,13 +1,16 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
-  const token = req.headers.authorization;
+  let token = req.headers.authorization;
+  console.log('midddlewear token: ' + token);
   if (!token) {
-    return next({ status: 401, message: 'token required' });
+    res.status(401).json({ message: 'token required' });
+    return;
   }
+  token = token.split(' ')[1];
   jwt.verify(token, 'shh', (err, decodedToken) => {
     if (err) {
-      next({ status: 401, message: 'token invalid' });
+      res.status(401).json({ message: 'token invalid' });
     } else {
       req.decodedToken = decodedToken;
       next();
