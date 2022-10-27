@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { add, findByUsername } = require('./user-model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
 router.post('/register', async (req, res) => {
   try {
     if (!req.body.username || !req.body.password) {
@@ -71,8 +72,8 @@ router.post('/login', async (req, res) => {
       }
     }
   } catch (error) {
-    console.log('register failed', error);
-    res.status(400).send(error.message);
+    console.log('login failed', error.message);
+    res.status(400).json({ message: error.message });
   }
 
   /*
