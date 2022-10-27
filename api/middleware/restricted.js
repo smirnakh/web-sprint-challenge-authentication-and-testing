@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
     res.status(401).json({ message: 'token required' });
     return;
   }
-  token = token.split(' ')[1];
+  //token = token.split(' ')[1];
   jwt.verify(token, 'shh', (err) => {
     if (err) {
       res.status(401).json({ message: 'token invalid' });
