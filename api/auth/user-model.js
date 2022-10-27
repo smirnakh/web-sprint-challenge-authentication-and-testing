@@ -11,6 +11,12 @@ async function add({ username, password }) {
   return user;
 }
 
+async function findByUsername(username) {
+  const user = await db('users').where({ username }).first();
+  return user;
+}
+
 module.exports = {
   add,
+  findByUsername,
 };

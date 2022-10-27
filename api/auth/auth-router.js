@@ -1,6 +1,5 @@
 const router = require('express').Router();
-
-const { add } = require('./user-model');
+const { add, findByUsername } = require('./user-model');
 
 router.post('/register', async (req, res) => {
   try {
@@ -8,8 +7,13 @@ router.post('/register', async (req, res) => {
       //res.status(400);
       throw new Error('username and password required');
     } else {
-      const user = await add(req.body);
-      res.json(user);
+      const userExists = await findByUsername(req.body.username);
+      if (userExists) {
+        throw new Error('username taken');
+      } else {
+        const user = await add(req.body);
+        res.json(user);
+      }
     }
   } catch (error) {
     console.log('register failed', error);
@@ -41,14 +45,6 @@ router.post('/register', async (req, res) => {
     4- On FAILED registration due to the `username` being taken,
       the response body should include a string exactly as follows: "username taken".
   */
-  // const { username, password } = req.body;
-  // const { role_name } = req;
-  // const hash = bcrypt.hashSync(password, 8);
-  // User.add({ username, password: hash, role_name })
-  //   .then((newUser) => {
-  //     res.status(201).json(newUser);
-  //   })
-  //   .catch(next);
 });
 
 router.post('/login', (req, res) => {
