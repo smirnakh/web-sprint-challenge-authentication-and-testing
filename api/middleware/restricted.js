@@ -8,11 +8,10 @@ module.exports = (req, res, next) => {
     return;
   }
   token = token.split(' ')[1];
-  jwt.verify(token, 'shh', (err, decodedToken) => {
+  jwt.verify(token, 'shh', (err) => {
     if (err) {
       res.status(401).json({ message: 'token invalid' });
     } else {
-      req.decodedToken = decodedToken;
       next();
     }
   });
